@@ -21,6 +21,9 @@ export const Navbar = () => {
 
         {user ? (
           <div className="flex items-center gap-4">
+            <Button variant="ghost" size="sm" onClick={() => navigate('/pricing-tools')}>
+              Price Tools
+            </Button>
             <div className="flex items-center gap-2">
               <User className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">{user.email}</span>

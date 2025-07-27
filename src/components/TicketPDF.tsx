@@ -260,7 +260,7 @@ export const TicketPDF: React.FC<TicketPDFProps> = ({ booking }) => {
         {/* Price */}
         <View style={styles.priceContainer}>
           <Text style={styles.priceLabel}>Total Amount Paid</Text>
-          <Text style={styles.price}>${booking.route.price.toFixed(2)}</Text>
+          <Text style={styles.price}>₹{booking.route.price.toFixed(2)}</Text>
         </View>
 
         {/* QR Code Placeholder */}
