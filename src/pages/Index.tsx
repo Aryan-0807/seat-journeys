@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { SearchForm } from "@/components/SearchForm";
@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Train, Bus, MapPin, Star, Users, Clock, ArrowRight } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 // Mock data - replace with Supabase queries
 const mockRoutes = [
@@ -62,46 +65,103 @@ const mockRoutes = [
 
 const Index = () => {
   const navigate = useNavigate();
-  const [routes, setRoutes] = useState(mockRoutes);
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [routes, setRoutes] = useState<any[]>([]);
+  const [filteredRoutes, setFilteredRoutes] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
-  const [user, setUser] = useState(null); // Replace with Supabase auth
+
+  useEffect(() => {
+    fetchRoutes();
+  }, []);
+
+  const fetchRoutes = async () => {
+    try {
+      const { data: routesData, error } = await supabase
+        .from('routes')
+        .select('*')
+        .order('departure_time', { ascending: true });
+
+      if (error) throw error;
+
+      // Calculate available seats for each route
+      const routesWithAvailableSeats = await Promise.all(
+        routesData.map(async (route) => {
+          const { count: bookedSeats } = await supabase
+            .from('seats')
+            .select('*', { count: 'exact', head: true })
+            .eq('route_id', route.id)
+            .eq('is_booked', true);
+
+          return {
+            ...route,
+            seats_available: route.seats_total - (bookedSeats || 0)
+          };
+        })
+      );
+
+      setRoutes(routesWithAvailableSeats);
+      setFilteredRoutes(routesWithAvailableSeats);
+    } catch (error) {
+      console.error('Error fetching routes:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load routes. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSearch = async (filters: any) => {
     setIsSearching(true);
     
-    // Simulate search
-    setTimeout(() => {
-      // Filter routes based on search criteria
-      let filteredRoutes = mockRoutes;
-      
-      if (filters.origin) {
-        filteredRoutes = filteredRoutes.filter(route => 
-          route.origin.toLowerCase().includes(filters.origin.toLowerCase())
-        );
-      }
-      
-      if (filters.destination) {
-        filteredRoutes = filteredRoutes.filter(route => 
-          route.destination.toLowerCase().includes(filters.destination.toLowerCase())
-        );
-      }
-      
-      if (filters.type !== 'all') {
-        filteredRoutes = filteredRoutes.filter(route => route.type === filters.type);
-      }
-      
-      setRoutes(filteredRoutes);
-      setIsSearching(false);
-    }, 1000);
+    // Filter routes based on search criteria
+    let filtered = routes;
+    
+    if (filters.origin) {
+      filtered = filtered.filter(route => 
+        route.origin.toLowerCase().includes(filters.origin.toLowerCase())
+      );
+    }
+    
+    if (filters.destination) {
+      filtered = filtered.filter(route => 
+        route.destination.toLowerCase().includes(filters.destination.toLowerCase())
+      );
+    }
+    
+    if (filters.type !== 'all') {
+      filtered = filtered.filter(route => route.type === filters.type);
+    }
+    
+    setFilteredRoutes(filtered);
+    setIsSearching(false);
   };
 
   const handleBookRoute = (route: any) => {
     navigate(`/route/${route.id}`);
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="flex items-center justify-center min-h-[50vh]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading routes...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
-      <Navbar user={user} onLogout={() => setUser(null)} />
+      <Navbar />
       
       {/* Hero Section */}
       <section className="gradient-hero text-white py-20">
@@ -112,6 +172,13 @@ const Index = () => {
           <p className="text-xl md:text-2xl mb-8 text-white/90 max-w-2xl mx-auto">
             Book train and bus tickets seamlessly. Choose your perfect seat and travel in comfort.
           </p>
+          {!user && (
+            <div className="mt-6 mb-8">
+              <Button size="lg" onClick={() => navigate('/auth')}>
+                Get Started - Sign Up Now
+              </Button>
+            </div>
+          )}
           <div className="flex items-center justify-center gap-8 mb-8">
             <div className="flex items-center gap-2">
               <Train className="h-6 w-6" />
@@ -139,14 +206,16 @@ const Index = () => {
           <div>
             <h2 className="text-3xl font-bold mb-2">Available Routes</h2>
             <p className="text-muted-foreground">
-              {routes.length} routes found for your journey
+              {filteredRoutes.length} routes found for your journey
             </p>
           </div>
           
-          <Button variant="outline" onClick={() => navigate('/bookings')}>
-            My Bookings
-            <ArrowRight className="h-4 w-4" />
-          </Button>
+          {user && (
+            <Button variant="outline" onClick={() => navigate('/bookings')}>
+              My Bookings
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          )}
         </div>
 
         {isSearching ? (
@@ -159,12 +228,19 @@ const Index = () => {
               </Card>
             ))}
           </div>
-        ) : routes.length > 0 ? (
+        ) : filteredRoutes.length > 0 ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {routes.map(route => (
+            {filteredRoutes.map(route => (
               <RouteCard
                 key={route.id}
-                route={route}
+                route={{
+                  ...route,
+                  departureTime: route.departure_time,
+                  arrivalTime: route.arrival_time,
+                  vehicleNumber: route.vehicle_number,
+                  availableSeats: route.seats_available,
+                  totalSeats: route.seats_total
+                }}
                 onBook={handleBookRoute}
               />
             ))}
@@ -178,7 +254,7 @@ const Index = () => {
             <p className="text-muted-foreground mb-6">
               Try adjusting your search criteria or check back later for new routes.
             </p>
-            <Button variant="accent" onClick={() => setRoutes(mockRoutes)}>
+            <Button variant="accent" onClick={() => setFilteredRoutes(routes)}>
               View All Routes
             </Button>
           </div>
