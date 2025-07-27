@@ -14,13 +14,154 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      bookings: {
+        Row: {
+          booked_at: string
+          id: string
+          route_id: string
+          seat_number: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          booked_at?: string
+          id?: string
+          route_id: string
+          seat_number: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          booked_at?: string
+          id?: string
+          route_id?: string
+          seat_number?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_route_id_fkey"
+            columns: ["route_id"]
+            isOneToOne: false
+            referencedRelation: "routes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      routes: {
+        Row: {
+          arrival_time: string
+          created_at: string
+          departure_time: string
+          destination: string
+          id: string
+          origin: string
+          price: number
+          seats_total: number
+          type: string
+          vehicle_number: string
+        }
+        Insert: {
+          arrival_time: string
+          created_at?: string
+          departure_time: string
+          destination: string
+          id?: string
+          origin: string
+          price?: number
+          seats_total?: number
+          type: string
+          vehicle_number: string
+        }
+        Update: {
+          arrival_time?: string
+          created_at?: string
+          departure_time?: string
+          destination?: string
+          id?: string
+          origin?: string
+          price?: number
+          seats_total?: number
+          type?: string
+          vehicle_number?: string
+        }
+        Relationships: []
+      }
+      seats: {
+        Row: {
+          booked_at: string | null
+          booked_by: string | null
+          created_at: string
+          id: string
+          is_booked: boolean
+          route_id: string
+          seat_number: string
+        }
+        Insert: {
+          booked_at?: string | null
+          booked_by?: string | null
+          created_at?: string
+          id?: string
+          is_booked?: boolean
+          route_id: string
+          seat_number: string
+        }
+        Update: {
+          booked_at?: string | null
+          booked_by?: string | null
+          created_at?: string
+          id?: string
+          is_booked?: boolean
+          route_id?: string
+          seat_number?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seats_route_id_fkey"
+            columns: ["route_id"]
+            isOneToOne: false
+            referencedRelation: "routes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_seats_for_route: {
+        Args: { route_uuid: string; total_seats: number }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
