@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Train, Bus, MapPin, Clock, Ticket, Calendar, X } from "lucide-react";
+import { DownloadTicketButton } from "./TicketPDF";
 
 export interface Booking {
   id: string;
@@ -119,17 +120,41 @@ export const BookingCard = ({ booking, onCancel, isLoading }: BookingCardProps) 
           <span>Booked on {formatDate(booking.booked_at)}</span>
         </div>
         
-        {!isCancelled && isUpcoming && (
-          <Button 
-            variant="destructive" 
-            size="sm"
-            onClick={() => onCancel(booking.id)}
-            disabled={isLoading}
-          >
-            <X className="h-4 w-4" />
-            Cancel Booking
-          </Button>
-        )}
+        <div className="flex gap-2">
+          {!isCancelled && (
+            <DownloadTicketButton
+              booking={{
+                id: booking.id,
+                routeId: booking.id, // Using booking id as route id
+                seatNumber: booking.seat_number,
+                route: {
+                  type: booking.route.type,
+                  origin: booking.route.origin,
+                  destination: booking.route.destination,
+                  departureTime: booking.route.departure_time,
+                  arrivalTime: booking.route.arrival_time,
+                  vehicleNumber: booking.route.vehicle_number,
+                  price: booking.price
+                },
+                bookedAt: booking.booked_at
+              }}
+              size="sm"
+              variant="outline"
+            />
+          )}
+          
+          {!isCancelled && isUpcoming && (
+            <Button 
+              variant="destructive" 
+              size="sm"
+              onClick={() => onCancel(booking.id)}
+              disabled={isLoading}
+            >
+              <X className="h-4 w-4" />
+              Cancel
+            </Button>
+          )}
+        </div>
       </div>
     </Card>
   );
