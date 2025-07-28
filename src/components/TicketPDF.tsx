@@ -15,7 +15,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 30,
     paddingBottom: 20,
-    borderBottom: 2,
+    borderBottomWidth: 2,
+    borderBottomStyle: 'solid',
     borderBottomColor: '#1e40af',
   },
   logo: {
@@ -53,7 +54,8 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#f8fafc',
     borderRadius: 8,
-    border: 1,
+    borderWidth: 1,
+    borderStyle: 'solid',
     borderColor: '#e2e8f0',
   },
   cityInfo: {
@@ -133,7 +135,8 @@ const styles = StyleSheet.create({
   footer: {
     marginTop: 'auto',
     paddingTop: 20,
-    borderTop: 1,
+    borderTopWidth: 1,
+    borderTopStyle: 'solid',
     borderTopColor: '#e5e7eb',
   },
   footerText: {
