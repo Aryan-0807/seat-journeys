@@ -6,10 +6,13 @@ import { RouteCard } from "@/components/RouteCard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Train, Bus, MapPin, Star, Users, Clock, ArrowRight } from "lucide-react";
+import { Train, Bus, MapPin, Star, Users, Clock, ArrowRight, Shield, Zap, Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import heroTrainImage from "@/assets/hero-train.jpg";
+import heroBusImage from "@/assets/hero-bus.jpg";
+import bookingFeatureImage from "@/assets/booking-feature.jpg";
 
 // Mock data - replace with Supabase queries
 const mockRoutes = [
@@ -164,41 +167,128 @@ const Index = () => {
       <Navbar />
       
       {/* Hero Section */}
-      <section className="gradient-hero text-white py-20">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6">
-            Your Journey Starts Here
-          </h1>
-          <p className="text-xl md:text-2xl mb-8 text-white/90 max-w-2xl mx-auto">
-            Book train and bus tickets seamlessly. Choose your perfect seat and travel in comfort.
-          </p>
-          {!user && (
-            <div className="mt-6 mb-8">
-              <Button size="lg" onClick={() => navigate('/auth')}>
-                Get Started - Sign Up Now
-              </Button>
+      <section className="relative overflow-hidden">
+        {/* Background Images */}
+        <div className="absolute inset-0 grid grid-cols-2">
+          <div 
+            className="bg-cover bg-center opacity-20"
+            style={{ backgroundImage: `url(${heroTrainImage})` }}
+          />
+          <div 
+            className="bg-cover bg-center opacity-20"
+            style={{ backgroundImage: `url(${heroBusImage})` }}
+          />
+        </div>
+        
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 gradient-hero"></div>
+        
+        {/* Content */}
+        <div className="relative z-10 text-white py-24">
+          <div className="container mx-auto px-4 text-center">
+            <div className="animate-fade-in">
+              <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-white/80">
+                Your Journey Starts Here
+              </h1>
+              <p className="text-xl md:text-2xl mb-8 text-white/90 max-w-3xl mx-auto leading-relaxed">
+                Experience seamless travel across India. Book train and bus tickets with confidence, 
+                choose your perfect seat, and travel in unmatched comfort.
+              </p>
             </div>
-          )}
-          <div className="flex items-center justify-center gap-8 mb-8">
-            <div className="flex items-center gap-2">
-              <Train className="h-6 w-6" />
-              <span className="text-lg">Trains</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Bus className="h-6 w-6" />
-              <span className="text-lg">Buses</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Star className="h-6 w-6" />
-              <span className="text-lg">Comfort</span>
+            
+            {!user && (
+              <div className="mt-8 mb-12 animate-scale-in">
+                <Button size="lg" className="px-8 py-4 text-lg bg-white text-primary hover:bg-white/90 hover:scale-105 transition-all duration-300 shadow-xl">
+                  Get Started - Sign Up Now
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </div>
+            )}
+            
+            <div className="flex items-center justify-center gap-12 mb-12 flex-wrap">
+              <div className="flex items-center gap-3 hover-scale">
+                <div className="p-3 rounded-full bg-white/20 backdrop-blur-sm">
+                  <Train className="h-8 w-8" />
+                </div>
+                <span className="text-xl font-medium">Premium Trains</span>
+              </div>
+              <div className="flex items-center gap-3 hover-scale">
+                <div className="p-3 rounded-full bg-white/20 backdrop-blur-sm">
+                  <Bus className="h-8 w-8" />
+                </div>
+                <span className="text-xl font-medium">Luxury Buses</span>
+              </div>
+              <div className="flex items-center gap-3 hover-scale">
+                <div className="p-3 rounded-full bg-white/20 backdrop-blur-sm">
+                  <Star className="h-8 w-8" />
+                </div>
+                <span className="text-xl font-medium">5-Star Service</span>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <div className="container mx-auto px-4 -mt-8 relative z-10 mb-12">
-        <SearchForm onSearch={handleSearch} isLoading={isSearching} />
+      {/* Search Form */}
+      <div className="container mx-auto px-4 -mt-12 relative z-20 mb-16">
+        <div className="animate-slide-in-right">
+          <SearchForm onSearch={handleSearch} isLoading={isSearching} />
+        </div>
       </div>
+
+      {/* Features Section */}
+      <section className="py-20 bg-gradient-to-b from-background to-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4">Why Choose SeatJourneys?</h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Experience the future of travel booking with our cutting-edge platform
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            <Card className="p-8 text-center card-hover border-0 shadow-medium bg-white/50 backdrop-blur-sm">
+              <div className="w-16 h-16 mx-auto mb-6 p-4 rounded-full gradient-primary">
+                <Shield className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-xl font-semibold mb-4">Secure & Safe</h3>
+              <p className="text-muted-foreground">
+                Bank-level security with encrypted payments and verified operators
+              </p>
+            </Card>
+            
+            <Card className="p-8 text-center card-hover border-0 shadow-medium bg-white/50 backdrop-blur-sm">
+              <div className="w-16 h-16 mx-auto mb-6 p-4 rounded-full gradient-accent">
+                <Zap className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-xl font-semibold mb-4">Lightning Fast</h3>
+              <p className="text-muted-foreground">
+                Book your tickets in under 2 minutes with our streamlined process
+              </p>
+            </Card>
+            
+            <Card className="p-8 text-center card-hover border-0 shadow-medium bg-white/50 backdrop-blur-sm">
+              <div className="w-16 h-16 mx-auto mb-6 p-4 rounded-full bg-gradient-to-r from-pink-500 to-rose-500">
+                <Heart className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-xl font-semibold mb-4">Customer Love</h3>
+              <p className="text-muted-foreground">
+                24/7 support and millions of satisfied customers across India
+              </p>
+            </Card>
+          </div>
+          
+          {/* Feature Image */}
+          <div className="relative">
+            <img 
+              src={bookingFeatureImage} 
+              alt="Easy booking interface" 
+              className="w-full max-w-4xl mx-auto rounded-2xl shadow-strong hover:scale-105 transition-transform duration-500"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl"></div>
+          </div>
+        </div>
+      </section>
 
       {/* Routes Section */}
       <section className="container mx-auto px-4 pb-16">
@@ -262,24 +352,32 @@ const Index = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="bg-muted/30 py-16">
+      <section className="py-20 bg-gradient-to-r from-primary/5 to-accent/5">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="text-3xl font-bold text-primary mb-2">1M+</div>
-              <div className="text-muted-foreground">Happy Travelers</div>
+            <div className="animate-fade-in">
+              <div className="text-4xl md:text-5xl font-bold text-primary mb-2 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
+                1M+
+              </div>
+              <div className="text-muted-foreground font-medium">Happy Travelers</div>
             </div>
-            <div>
-              <div className="text-3xl font-bold text-primary mb-2">500+</div>
-              <div className="text-muted-foreground">Cities Connected</div>
+            <div className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
+              <div className="text-4xl md:text-5xl font-bold text-primary mb-2 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
+                500+
+              </div>
+              <div className="text-muted-foreground font-medium">Cities Connected</div>
             </div>
-            <div>
-              <div className="text-3xl font-bold text-primary mb-2">24/7</div>
-              <div className="text-muted-foreground">Customer Support</div>
+            <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              <div className="text-4xl md:text-5xl font-bold text-primary mb-2 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
+                24/7
+              </div>
+              <div className="text-muted-foreground font-medium">Customer Support</div>
             </div>
-            <div>
-              <div className="text-3xl font-bold text-primary mb-2">99%</div>
-              <div className="text-muted-foreground">On-Time Performance</div>
+            <div className="animate-fade-in" style={{ animationDelay: '0.3s' }}>
+              <div className="text-4xl md:text-5xl font-bold text-primary mb-2 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
+                99%
+              </div>
+              <div className="text-muted-foreground font-medium">On-Time Performance</div>
             </div>
           </div>
         </div>
